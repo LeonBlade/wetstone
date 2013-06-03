@@ -19,4 +19,10 @@ Route::post("/office", function () {
 
 Route::controller("loli");
 
+//
+
+Route::get("/lolis/:id/test", function ($id) {
+	View::wet("loli", array('id' => $id));
+});
+
 ?>

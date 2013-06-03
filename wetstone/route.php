@@ -77,11 +77,13 @@ class Route {
 
 				// do the lengths match
 				if (count($path_parts) == count($uri_parts)) {
+					// initialize args
+					$args = array();
 					// loop over the parts
 					foreach ($path_parts as $i => $piece) {
-						$args = array();
 						// if either path parts is a variable or the parts match
 						if ($path_parts[$i][0] == ":" || $path_parts[$i] == $uri_parts[$i]) {
+							// set valid to true
 							$valid = true;
 							// if this is a variable then pass it into the args
 							if ($path_parts[$i][0] == ":") {
