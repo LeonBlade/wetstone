@@ -1,18 +1,17 @@
 <?php
 
 class View {
-	
-	public static function wet($view, $arguments = array()) {
 
+	/* renders the compiled view on the page */
+	public static function render($view, $arguments = array()) {
 		// compile the view and echo it out
 		echo View::compile($view, $arguments);
-		
 	}
 
+	/* compiles the view with output buffers as a quick and dirty template renderer returns string of view */
 	public static function compile($view, $arguments = array()) {
-
 		// store the view path
-		$view_path = __DIR__ . "view/$view.view.php";
+		$view_path = "view/$view.view.php";
 
 		// initialize blank buffer
 		$buffer = "";
@@ -25,6 +24,9 @@ class View {
 			// extract arguments from array into scope
 			extract($arguments);
 
+			// get uri for the page
+			$uri = $_SERVER['REQUEST_URI'];
+
 			// include the view
 			include $view_path;
 
@@ -34,7 +36,6 @@ class View {
 
 		// return the buffer
 		return $buffer;
-
 	}
 
 }
