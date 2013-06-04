@@ -7,6 +7,9 @@
 // start a session
 session_start();
 
+// define the URL path to where the main web root is
+define('__DIR__', "..");
+
 // require the helper file
 require_once "wetstone/helper.php";
 // require the route class

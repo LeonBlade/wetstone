@@ -12,7 +12,7 @@ class View {
 	public static function compile($view, $arguments = array()) {
 
 		// store the view path
-		$view_path = "view/$view.view.php";
+		$view_path = __DIR__ . "view/$view.view.php";
 
 		// initialize blank buffer
 		$buffer = "";
