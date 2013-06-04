@@ -107,8 +107,7 @@ class Route {
 				}
 			}
 			// no route was found
-			echo "No route for $method \"$uri\" configured.";
-			debug(Route::$routes[$method]);
+			header("Location: /");
 		}
 	}
 
