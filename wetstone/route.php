@@ -82,7 +82,7 @@ class Route {
 					// loop over the parts
 					foreach ($path_parts as $i => $piece) {
 						// if either path parts is a variable or the parts match
-						if ($path_parts[$i][0] == ":" || $path_parts[$i] == $uri_parts[$i]) {
+						if (!empty($path_parts[$i]) && ($path_parts[$i][0] == ":" || $path_parts[$i] == $uri_parts[$i])) {
 							// set valid to true
 							$valid = true;
 							// if this is a variable then pass it into the args
