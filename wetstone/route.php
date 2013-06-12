@@ -48,7 +48,7 @@ class Route {
 	public static function proccess() {
 		// grabbing server variables for this request
 		$method = ris(array($_SERVER, 'REQUEST_METHOD'), "GET");
-		$uri = ris(array($_SERVER, 'PATH_INFO'), "/");
+		$uri = ris(array($_SERVER, 'REQUEST_URI'), "/");
 		$args = ris(array($_SERVER, 'QUERY_STRING'), array());
 
 		// parse string args to array
