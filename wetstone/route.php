@@ -49,17 +49,20 @@ class Route {
 		// grabbing server variables for this request
 		$method = ris(array($_SERVER, 'REQUEST_METHOD'), "GET");
 		$uri = ris(array($_SERVER, 'REQUEST_URI'), "/");
-		$args = ris(array($_SERVER, 'QUERY_STRING'), array());
 
-		// parse string args to array
-		parse_str($args, $args_array);
+		// explode off the uri for query
+		$uri_parts = explode("?", $uri);
+
+		// set the main uri to the first part
+		if (!empty($uri_parts))
+			$uri = $uri_parts[0];
 
 		// is this a normal uri path and does it exist in routes
 		if (isset(Route::$routes[$method][$uri])) {
 			// grab the callback
 			$callback = Route::$routes[$method][$uri];
 			// execute callback
-			call_user_func_array($callback, $args_array);
+			call_user_func_array($callback, $_REQUEST);
 		}
 		else {
 			// test the uri against any possible regex matching
@@ -100,7 +103,7 @@ class Route {
 					// if the path is valid for this uri
 					if ($valid) {
 						// call the callback with an array merge of query args and uri args
-						call_user_func_array($callback, array_merge($args, $args_array));
+						call_user_func_array($callback, array_merge($args, $_REQUEST));
 						// get outta here bud
 						return;
 					}
