@@ -106,9 +106,9 @@ class DB {
 			// create an array from the results
 			$array = mysql_fetch_assoc($result);
 			// if there is only one field then return it as a single value
-			if (mysql_num_fields($result) == 1)
+			if (mysql_num_fields($result) == 1) {
 				// shift off the first element and return it
-				$array = array_shift($array)
+				$array = array_shift($array);
 			}
 		}
 
