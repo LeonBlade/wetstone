@@ -50,7 +50,7 @@ class DB {
 				}
 			}
 		}
-		else {
+		else if (!is_array($post) && !is_bool($post) && $post !== null) {
 			// if not then we just escape the string
 			$post = mysql_real_escape_string($post);
 		}
@@ -147,6 +147,63 @@ class DB {
 
 		// return back the array
 		return $array;
+	}
+
+	// saving data to the server
+	public static function save($data, $table, $key = "id") {
+		// make sure that all the data is passed
+		if (is_array($data) && !empty($data) && !empty($table)) {
+
+			// set up an inserts array
+			$inserts = array();
+			// initialize update to false
+			$method = "INSERT";
+			// where clause
+			$where = "";
+
+			// if id is sent then we are updating a row
+			if (isset($data[$key]) && !empty($data[$key])) {
+				// store the id and unset it so it's not updated
+				$id = $data[$key];
+				unset($data[$key]);
+
+				// set that we are updating
+				$method = "UPDATE";
+				// set the where clause
+				$where = "WHERE $key = '$id'";
+			}
+
+			// loop through the data
+			foreach ($data as $key => $value) {
+				// if its an array leave it alone
+				if (is_array($value)) {
+					$value = $value[0];
+				}
+				// quote around the value
+				else if ($value != "NOW()") {
+					$value = "\"$value\"";
+				}
+
+				// add to inserts
+				$inserts[] = "`$field` = $value";
+			}
+
+			// implode the inserts
+			$inserts = implode(",", $inserts);
+
+			// update the data
+			$result = DB::query("$method `$table` SET $inserts $where");
+
+			// if we are updating then set result to the ID we passed in
+			if ($method == "UPDATE") 
+				$result = $id;
+			// otherwise grab the last inserted id
+			else
+				$result = mysql_insert_id();
+
+			// return the id
+			return $result;
+		}
 	}
 }
 
