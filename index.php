@@ -1,23 +1,25 @@
 <?php
 
 //
-// Wetstone v1.0 β
+// Wetstone v1.1 β
 //
 
 // start a session
 session_start();
 
-// define the URL path to where the main web root is
-define('__DIR__', "..");
+// require a confiuration file for some constants
+require_once "config.php";
 
-// require the helper file
-require_once "wetstone/helper.php";
+// require the wetstone base class file
+require_once "wetstone/wetstone.php";
 // require the route class
 require_once "wetstone/route.php";
 // require the controller class
 require_once "wetstone/controller.php";
 // require the view class
 require_once "wetstone/view.php";
+// require the db class
+require_once "wetstone/db.php";
 
 // load the controllers from the controller directory
 Controller::loadDir("controllers");

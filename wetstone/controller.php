@@ -5,7 +5,7 @@ class Controller {
 	private static $controllers = array();
 
 	public static function get($name = null) {
-		if ($name) return ris(array(self::$controllers, $name));
+		if ($name) return Wetstone::ris(array(self::$controllers, $name));
 		return self::$controllers;
 	}
 

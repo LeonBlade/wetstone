@@ -8,7 +8,8 @@ class Route {
 		"POST" => array(),
 		"PUT" => array(),
 		"DELETE" => array(),
-		"CONTROLLER" => array()
+		"CONTROLLER" => array(),
+		"ERROR" => array()
 	);
 
 	/* respond to get on path */
@@ -31,6 +32,11 @@ class Route {
 		Route::_route("DELETE", $path, $callback);
 	}
 
+	/* responds to a 404 */
+	public static function error($status, $callback) {
+		Route::_route("ERROR", $status, $callback);
+	}
+
 	/* shouldn't be called directly adds routes to the route object */
 	private static function _route($method, $path, $callback) {
 		Route::$routes[$method][$path] = $callback;
@@ -47,8 +53,8 @@ class Route {
 	/* process the url and route accordingly */
 	public static function proccess() {
 		// grabbing server variables for this request
-		$method = ris(array($_SERVER, 'REQUEST_METHOD'), "GET");
-		$uri = ris(array($_SERVER, 'REQUEST_URI'), "/");
+		$method = Wetstone::ris(array($_SERVER, 'REQUEST_METHOD'), "GET");
+		$uri = Wetstone::ris(array($_SERVER, 'REQUEST_URI'), "/");
 
 		// explode off the uri for query
 		$uri_parts = explode("?", $uri);
@@ -109,8 +115,12 @@ class Route {
 					}
 				}
 			}
-			// no route was found
-			header("Location: /");
+
+			// no route was found call the 404 route if exists
+			if (Wetstone::ris([Route::$routes, "ERROR", "404"]))
+				call_user_func_array(Route::$routes["ERROR"]["404"], array_merge($args, $_REQUEST));
+			else
+				header("Location: /");
 		}
 	}
 
