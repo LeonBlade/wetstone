@@ -8,8 +8,7 @@ class Route {
 		"POST" => array(),
 		"PUT" => array(),
 		"DELETE" => array(),
-		"CONTROLLER" => array(),
-		"ERROR" => array()
+		"CONTROLLER" => array()
 	);
 
 	/* respond to get on path */
@@ -32,11 +31,6 @@ class Route {
 		Route::_route("DELETE", $path, $callback);
 	}
 
-	/* responds to a 404 */
-	public static function error($status, $callback) {
-		Route::_route("ERROR", $status, $callback);
-	}
-
 	/* shouldn't be called directly adds routes to the route object */
 	private static function _route($method, $path, $callback) {
 		Route::$routes[$method][$path] = $callback;
@@ -53,8 +47,8 @@ class Route {
 	/* process the url and route accordingly */
 	public static function proccess() {
 		// grabbing server variables for this request
-		$method = Wetstone::ris(array($_SERVER, 'REQUEST_METHOD'), "GET");
-		$uri = Wetstone::ris(array($_SERVER, 'REQUEST_URI'), "/");
+		$method = ris(array($_SERVER, 'REQUEST_METHOD'), "GET");
+		$uri = ris(array($_SERVER, 'REQUEST_URI'), "/");
 
 		// explode off the uri for query
 		$uri_parts = explode("?", $uri);
@@ -73,54 +67,30 @@ class Route {
 		else {
 			// test the uri against any possible regex matching
 			foreach (Route::$routes[$method] as $path => $callback) {
-				// set up valid variable
-				$valid = false;
+				// create regex pattern based on path
+				$regex_path = preg_replace("/:([\w_\-]+)/", "([^/&+?]+)", $path);
+				// add slashes to escape forward slashes in normal urls
+				$regex_path = str_replace("/", "\/", $regex_path);
+				// add slashes to escape ?
+				$regex_path = str_replace("?", "\?", $regex_path);
+				// add slashes to escape .
+				$regex_path = str_replace(".", "\.", $regex_path);
 
-				// split the url path 
-				$path_parts = explode("/", $path);
-				array_shift($path_parts);
-
-				// split up the current uri
-				$uri_parts = explode("/", $uri);
-				array_shift($uri_parts);
-
-				// do the lengths match
-				if (count($path_parts) == count($uri_parts)) {
-					// initialize args
-					$args = array();
-					// loop over the parts
-					foreach ($path_parts as $i => $piece) {
-						// if either path parts is a variable or the parts match
-						if (!empty($path_parts[$i]) && ($path_parts[$i][0] == ":" || $path_parts[$i] == $uri_parts[$i])) {
-							// set valid to true
-							$valid = true;
-							// if this is a variable then pass it into the args
-							if ($path_parts[$i][0] == ":") {
-								$args[] = $uri_parts[$i];
-							}
-						}
-						else {
-							// we are not valid
-							$valid = false;
-							// break out of this for loop
-							break;
-						}
-					}
-					// if the path is valid for this uri
-					if ($valid) {
-						// call the callback with an array merge of query args and uri args
-						call_user_func_array($callback, array_merge($args, $_REQUEST));
-						// get outta here bud
-						return;
-					}
+				// match against the url
+				if (preg_match_all("/^$regex_path$/", $uri, $matches)) {
+					// shift off the full patern matched
+					array_shift($matches);
+					// fix the array
+					foreach ($matches as $key => $value)
+						$matches[$key] = $value[0];
+					// call the callback with an array merge of the query args and uri args
+					call_user_func_array($callback, array_merge($matches, $_REQUEST));
+					return;
 				}
 			}
 
-			// no route was found call the 404 route if exists
-			if (Wetstone::ris([Route::$routes, "ERROR", "404"]))
-				call_user_func_array(Route::$routes["ERROR"]["404"], array_merge($args, $_REQUEST));
-			else
-				header("Location: /");
+			// no route was found
+			header("Location: /");
 		}
 	}
 

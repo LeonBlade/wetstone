@@ -2,31 +2,24 @@
 
 class DB {
 
-	/* connect to the database */
-	public static function connect($host = DB_HOST, $user = DB_USER, $password = DB_PASS, $database = DB_DATABASE) {
+	public static function connect($host = "localhost", $user = "root", $password, $database) {
 		// connect to the database server
 		if (!mysql_connect($host, $user, $password)) {
-			Wetsone::debug("Couldn't connect to the database server!");
+			debug("Couldn't connect to the database server!");
 			die();
 		}
 
 		// select the database
 		if (!mysql_select_db($database)) {
-			Wetsone::debug("Couldn't select database!");
+			debug("Couldn't select database!");
 			die();
 		}
 	}
 
-	/* get a properly formated for mysql  */
-	public static function mySQLDatetime($datetime = null) {
-		// if its null then we default to the current time
-		if (!$datetime)
-			$datetime = time();
-		// return the formated date
+	public static function mysqlDatetime($datetime) {
 		return date("Y-m-d H:i:s", strtotime($datetime));
 	}
 
-	/* call this function to get a sanitized $_REQUEST array */
 	public static function safeMySQL($required = null, $post = null) {
 		// if we aren't passing in the post manually then just grab the POST/GET variables
 		if (!$post) 
@@ -45,7 +38,7 @@ class DB {
 		// if post is an array and not empty
 		if (is_array($post) && !empty($post)) {
 			// loop over each part of post
-			foreach ($post as $key => $value) {
+			foreach ($post as $value) {
 				// if the value isn't empty
 				if (!empty($value)) {
 					// call self to safe the value
@@ -66,20 +59,20 @@ class DB {
 		return $post;
 	}
 
-	/* standard query */
+	// standard query
 	public static function query($sql) {
 		// get the result from the query
 		$result = mysql_query($sql);
 		// is there an error
 		if ($error = mysql_error()) {
-			Wetsone::debug("Error: $error");
+			debug("Error: $error");
 		}
 
 		// return the result
 		return $result;
 	}
 
-	/* requesting a value from a query */
+	// requesting a value from a query
 	public static function queryValue($sql) {
 		// make the query
 		$result = mysql_query($sql);
@@ -96,7 +89,7 @@ class DB {
 
 			// is there an error
 			if ($error = mysql_error()) {
-				Wetsone::debug("Error: $error");
+				debug("Error: $error");
 			}
 
 			// return back the array
@@ -104,7 +97,7 @@ class DB {
 		}
 	}
 
-	/* requesting one row from a query */
+	// requesting one row from a query
 	public static function querySingle($sql) {
 		// make the query
 		$result = mysql_query($sql);
@@ -121,14 +114,14 @@ class DB {
 
 		// is there an error
 		if ($error = mysql_error()) {
-			Wetsone::debug("Error: $error");
+			debug("Error: $error");
 		}
 
 		// return back the array
 		return $array;
 	}
 
-	/* requesting multiple rows from a query */
+	// requesting multiple rows from a query
 	public static function queryMulti($sql) {
 		// make the query
 		$result = mysql_query($sql);
@@ -149,14 +142,14 @@ class DB {
 
 		// is there an error
 		if ($error = mysql_error()) {
-			Wetsone::debug("Error: $error");
+			debug("Error: $error");
 		}
 
 		// return back the array
 		return $array;
 	}
 
-	/* saving data to the server */
+	// saving data to the server
 	public static function save($data, $table, $key = "id") {
 		// make sure that all the data is passed
 		if (is_array($data) && !empty($data) && !empty($table)) {
@@ -192,14 +185,17 @@ class DB {
 				}
 
 				// add to inserts
-				$inserts[] = "`$field` = $value";
+				$inserts[] = "`$key` = $value";
 			}
 
 			// implode the inserts
 			$inserts = implode(",", $inserts);
 
+
+			$sql = "$method `$table` SET $inserts $where";
+
 			// update the data
-			$result = DB::query("$method `$table` SET $inserts $where");
+			$result = DB::query($sql);
 
 			// if we are updating then set result to the ID we passed in
 			if ($method == "UPDATE") 
