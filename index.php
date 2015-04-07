@@ -1,13 +1,14 @@
 <?php
 
 //
-// Wetstone v1.2 β
+// Wetstone v1.3 β
 //
-
-ini_set("short_open_tag", 1);
 
 // start a session
 session_start();
+
+// require the config file
+require_once "config.php";
 
 // require the helper file
 require_once "wetstone/helper.php";
@@ -21,13 +22,15 @@ require_once "wetstone/view.php";
 require_once "wetstone/db.php";
 
 // connect to the database
-//DB::connect(MYSQL_HOST, MYSQL_USER, MYSQL_PASS, MYSQL_DB);
+// DB::connect(MYSQL_HOST, MYSQL_USER, MYSQL_PASS, MYSQL_DB);
 
 // load the controllers from the controller directory
 Controller::loadDir("controllers");
 
 // require the router file
 require_once "router.php";
+
+chdir("../");
 
 // proccess the route
 Route::proccess();
