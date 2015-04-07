@@ -69,8 +69,12 @@ class Route {
 			foreach (Route::$routes[$method] as $path => $callback) {
 				// create regex pattern based on path
 				$regex_path = preg_replace("/:([\w_\-]+)/", "([^/&+?]+)", $path);
-				// escape out our regex expression
-				$regex_path = preg_quote($regex_path, "/");
+				// add slashes to escape forward slashes in normal urls
+				$regex_path = str_replace("/", "\/", $regex_path);
+				// add slashes to escape ?
+				$regex_path = str_replace("?", "\?", $regex_path);
+				// add slashes to escape .
+				$regex_path = str_replace(".", "\.", $regex_path);
 
 				// match against the url
 				if (preg_match_all("/^$regex_path$/", $uri, $matches)) {
